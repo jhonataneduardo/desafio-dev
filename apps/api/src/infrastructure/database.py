@@ -1,8 +1,16 @@
+import os
 
 from playhouse.shortcuts import model_to_dict
-from peewee import Model, CharField, DecimalField, DateTimeField, SmallIntegerField, DateField, TimeField
+from peewee import PostgresqlDatabase, Model, CharField, DecimalField, DateTimeField, SmallIntegerField, DateField, TimeField
 
-from infrastructure.database.session import db
+
+session = PostgresqlDatabase(
+    database=os.environ.get("DATABASE_NAME"),
+    host=os.environ.get("DATABASE_HOST"),
+    port=os.environ.get("DATABASE_PORT"),
+    user=os.environ.get("DATABASE_USER"),
+    password=os.environ.get("DATABASE_PASSWORD")
+)
 
 
 class TransactionModel(Model):
@@ -19,4 +27,7 @@ class TransactionModel(Model):
     updated_at: DateTimeField = DateTimeField(null=True)
 
     class Meta:
-        database = db
+        database = session
+
+
+session.connect()
