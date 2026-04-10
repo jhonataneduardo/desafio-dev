@@ -84,3 +84,26 @@ def test_entity_transaction():
     assert transaction.store_name == "Loja Teste"
     assert transaction.store_owner == "João Silva"
     assert transaction.amount == 250.0
+    
+def test_entity_transaction_from_dict():
+    data = {
+        "type": 4,
+        "date": date(2024, 6, 1),
+        "card_number": "9876-5432-1098-7654",
+        "national_id": "987.654.321-00",
+        "hour": time(16, 45),
+        "store_name": "Loja Teste",
+        "store_owner": "João Silva",
+        "amount": 250.0
+    }
+    
+    transaction = EntityTransaction.from_dict(data)
+    
+    assert transaction.type == TypeTransaction.CREDITO.value
+    assert transaction.date == date(2024, 6, 1)
+    assert transaction.card_number == "9876-5432-1098-7654"
+    assert transaction.national_id == "987.654.321-00"
+    assert transaction.hour == time(16, 45)
+    assert transaction.store_name == "Loja Teste"
+    assert transaction.store_owner == "João Silva"
+    assert transaction.amount == 250.0

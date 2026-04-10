@@ -40,3 +40,8 @@ class EntityTransaction(EntityBase):
 
     def to_dict(self) -> Dict[str, str]:
         return asdict(self)
+
+    @classmethod
+    def from_dict(cls, data: Dict):
+        data_copy = data
+        return cls(**data_copy)
