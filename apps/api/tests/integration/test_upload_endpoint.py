@@ -3,11 +3,11 @@ import pytest
 
 
 class TestUploadCnabEndpoint:
-    """Testes de integração para o endpoint POST /api/v1/uploads/cnab."""
+    """Testes de integração para o endpoint POST /api/v1/transactions/import."""
 
     def test_upload_valid_cnab_returns_201(self, client, cnab_valid_file_content):
         response = client.post(
-            "/api/v1/uploads/cnab",
+            "/api/v1/transactions/import",
             files={"file": ("cnab.txt", io.BytesIO(
                 cnab_valid_file_content), "text/plain")},
         )
@@ -20,7 +20,7 @@ class TestUploadCnabEndpoint:
 
     def test_upload_valid_cnab_returns_correct_structure(self, client, cnab_valid_file_content):
         response = client.post(
-            "/api/v1/uploads/cnab",
+            "/api/v1/transactions/import",
             files={"file": ("cnab.txt", io.BytesIO(
                 cnab_valid_file_content), "text/plain")},
         )
@@ -37,7 +37,7 @@ class TestUploadCnabEndpoint:
 
     def test_upload_empty_file_returns_error(self, client):
         response = client.post(
-            "/api/v1/uploads/cnab",
+            "/api/v1/transactions/import",
             files={"file": ("empty.txt", io.BytesIO(b""), "text/plain")},
         )
 
@@ -48,7 +48,7 @@ class TestUploadCnabEndpoint:
     def test_upload_short_lines_returns_error(self, client):
         short_content = b"short line here"
         response = client.post(
-            "/api/v1/uploads/cnab",
+            "/api/v1/transactions/import",
             files={"file": ("bad.txt", io.BytesIO(
                 short_content), "text/plain")},
         )
@@ -59,5 +59,5 @@ class TestUploadCnabEndpoint:
         assert body["error"] is not None
 
     def test_upload_without_file_returns_422(self, client):
-        response = client.post("/api/v1/uploads/cnab")
+        response = client.post("/api/v1/transactions/import")
         assert response.status_code == 422

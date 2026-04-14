@@ -5,11 +5,11 @@ from datetime import date, time
 from domain.entities import EntityTransaction, TypeTransaction
 from domain.repositories import TransactionRepositoryInterface
 from domain.entities import TransactionQuery
-from application.usecases.search_transactions_use_case import SearchTransactionsUseCase
+from application.usecases.get_transactions_summary_use_case import GetTransactionsSummaryUseCase
 
 
-class TestSearchTransactionsUseCase:
-    """Testes unitários para o caso de uso SearchTransactionsUseCase."""
+class TestGetTransactionsSummaryUseCase:
+    """Testes unitários para o caso de uso GetTransactionsSummaryUseCase."""
 
     @pytest.fixture
     def mock_repository(self):
@@ -17,7 +17,7 @@ class TestSearchTransactionsUseCase:
 
     @pytest.fixture
     def use_case(self, mock_repository):
-        return SearchTransactionsUseCase(mock_repository)
+        return GetTransactionsSummaryUseCase(mock_repository)
 
     @pytest.fixture
     def transactions_same_store(self):
@@ -80,35 +80,55 @@ class TestSearchTransactionsUseCase:
         ]
 
     def test_initialization(self, mock_repository):
-        use_case = SearchTransactionsUseCase(mock_repository)
+        use_case = GetTransactionsSummaryUseCase(mock_repository)
         assert use_case.transaction_repository is mock_repository
 
-    def test_execute_without_group_by_returns_list(
-        self, use_case, mock_repository, sample_transactions
+    def test_execute_with_group_by_store_returns_dict(
+        self, use_case, mock_repository, transactions_multiple_stores
     ):
-        params = TransactionQuery(group_by=None)
-        mock_repository.find_all.return_value = sample_transactions
+        params = TransactionQuery(group_by="store")
+        mock_repository.find_all.return_value = transactions_multiple_stores
 
         result = use_case.execute(params)
 
-        assert isinstance(result, list)
-        assert len(result) == 2
-        mock_repository.find_all.assert_called_once_with(params)
+        assert isinstance(result, dict)
+        assert "BAR DO JOAO" in result
+        assert "LOJA CENTRAL" in result
 
+    def test_execute_with_group_by_store_groups_correctly(
+        self, use_case, mock_repository, transactions_multiple_stores
+    ):
+        params = TransactionQuery(group_by="store")
+        mock_repository.find_all.return_value = transactions_multiple_stores
 
+        result = use_case.execute(params)
 
-    def test_execute_with_empty_result(self, use_case, mock_repository):
-        params = TransactionQuery(group_by=None)
+        assert len(result["BAR DO JOAO"]) == 2
+        assert len(result["LOJA CENTRAL"]) == 1
+
+    def test_execute_with_group_by_store_single_store(
+        self, use_case, mock_repository, transactions_same_store
+    ):
+        params = TransactionQuery(group_by="store")
+        mock_repository.find_all.return_value = transactions_same_store
+
+        result = use_case.execute(params)
+
+        assert len(result) == 1
+        assert "BAR DO JOAO" in result
+        assert len(result["BAR DO JOAO"]) == 2
+
+    def test_execute_with_group_by_store_empty_result(self, use_case, mock_repository):
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.return_value = []
 
         result = use_case.execute(params)
 
-        assert result == []
-
-
+        assert isinstance(result, dict)
+        assert len(result) == 0
 
     def test_execute_propagates_repository_exception(self, use_case, mock_repository):
-        params = TransactionQuery(group_by=None)
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.side_effect = Exception("Database error")
 
         with pytest.raises(Exception, match="Database error"):
