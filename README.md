@@ -14,7 +14,12 @@ O projeto foi inteiramente "dockerizado" para facilitar a execução e garantir 
 ### Passos para rodar
 
 1. Clone o repositório na sua máquina ou acesse o diretório raiz.
-2. Na raiz do projeto (onde está localizado o arquivo `docker-compose.yml`), execute o comando abaixo no terminal:
+2. Copie os arquivos de exemplo para criar seus próprios arquivos de variáveis de ambiente (`.env`):
+
+   ```bash
+   cp apps/web/.env.example apps/web/.env
+   ```
+3. Na raiz do projeto (onde está localizado o arquivo `docker-compose.yml`), execute o comando abaixo no terminal:
 
 ```bash
 docker compose up --build
