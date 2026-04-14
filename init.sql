@@ -1,7 +1,7 @@
--- Criar sequência para tabela transactions
+-- Criar sequência
 CREATE SEQUENCE transactions_id_seq;
 
--- Criar tabela transactions
+-- Criar tabela
 CREATE TABLE transactions (
     id INTEGER PRIMARY KEY DEFAULT nextval('transactions_id_seq'),
     type SMALLINT NOT NULL,
@@ -15,3 +15,7 @@ CREATE TABLE transactions (
     created_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NULL
 );
+
+-- Criar índices (fora da tabela)
+CREATE INDEX idx_transactions_store_name ON transactions (store_name);
+CREATE INDEX idx_transactions_date ON transactions (date);
