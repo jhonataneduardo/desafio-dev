@@ -1,6 +1,19 @@
 version: '3.8'
 
 services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: web
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - VITE_API_URL=http://api:8000
+    depends_on:
+      - api
+
   api:
     build:
       context: ./apps/api
@@ -32,6 +45,7 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U desafio_user -d desafio_db"]
       interval: 5s
