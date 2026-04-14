@@ -1,85 +1,174 @@
-# Desafio programação - para vaga desenvolvedor
+# Desafio Dev - Importação de CNAB
 
-Por favor leiam este documento do começo ao fim, com muita atenção.
-O intuito deste teste é avaliar seus conhecimentos técnicos em programação.
-O teste consiste em parsear [este arquivo de texto(CNAB)](https://github.com/ByCodersTec/desafio-ruby-on-rails/blob/master/CNAB.txt) e salvar suas informações(transações financeiras) em uma base de dados a critério do candidato.
-Este desafio deve ser feito por você em sua casa. Gaste o tempo que você quiser, porém normalmente você não deve precisar de mais do que algumas horas.
+Este é um projeto full-stack para upload e processamento de dados transacionais a partir de arquivos CNAB (Padrão Bycoders 😆). O sistema é capaz de realizar a leitura, conversão de tipagem e normalização de dados antes de salvá-los no banco de dados.
 
-# Instruções de entrega do desafio
+## 1. Setup de Ambiente e Execução Local
 
-1. Primeiro, faça um fork deste projeto para sua conta no Github (crie uma se você não possuir).
-2. Em seguida, implemente o projeto tal qual descrito abaixo, em seu clone local.
-3. Por fim, envie via email o projeto ou o fork/link do projeto para seu contato Bycoders_ com cópia para rh@bycoders.com.br.
+O projeto foi inteiramente "dockerizado" para facilitar a execução e garantir um ambiente padronizado.
 
-# Descrição do projeto
+### Pré-requisitos
 
-Você recebeu um arquivo CNAB com os dados das movimentações finanaceira de várias lojas.
-Precisamos criar uma maneira para que estes dados sejam importados para um banco de dados.
+- Docker
+- Docker Compose
 
-Sua tarefa é criar uma interface web que aceite upload do [arquivo CNAB](https://github.com/ByCodersTec/desafio-ruby-on-rails/blob/master/CNAB.txt), normalize os dados e armazene-os em um banco de dados relacional e exiba essas informações em tela.
+### Passos para rodar
 
-**Sua aplicação web DEVE:**
+1. Clone o repositório na sua máquina ou acesse o diretório raiz.
+2. Na raiz do projeto (onde está localizado o arquivo `docker-compose.yml`), execute o comando abaixo no terminal:
 
-1. Ter uma tela (via um formulário) para fazer o upload do arquivo(pontos extras se não usar um popular CSS Framework )
-2. Interpretar ("parsear") o arquivo recebido, normalizar os dados, e salvar corretamente a informação em um banco de dados relacional, **se atente as documentações** que estão logo abaixo.
-3. Exibir uma lista das operações importadas por lojas, e nesta lista deve conter um totalizador do saldo em conta
-4. Ser escrita na sua linguagem de programação de preferência
-5. Ser simples de configurar e rodar, funcionando em ambiente compatível com Unix (Linux ou Mac OS X). Ela deve utilizar apenas linguagens e bibliotecas livres ou gratuitas.
-6. Git com commits atomicos e bem descritos
-7. PostgreSQL, MySQL ou SQL Server
-8. Ter testes automatizados
-9. Docker compose (Pontos extras se utilizar)
-10. Readme file descrevendo bem o projeto e seu setup
-11. Incluir informação descrevendo como consumir o endpoint da API
+```bash
+docker compose up --build
+```
 
-**Sua aplicação web não precisa:**
+O comando irá construir e iniciar três containers:
 
-1. Lidar com autenticação ou autorização (pontos extras se ela fizer, mais pontos extras se a autenticação for feita via OAuth).
-2. Ser escrita usando algum framework específico (mas não há nada errado em usá-los também, use o que achar melhor).
-3. Documentação da api.(Será um diferencial e pontos extras se fizer)
+- `db`: Banco de dados PostgreSQL (na porta `5432`).
+- `api`: Backend da aplicação (disponibilizado na porta `8000`).
+- `web`: Frontend da aplicação (disponibilizado na porta `3000`).
 
-# Documentação do CNAB
+Aguarde até que o log sinalize que os servidores estão rodando.
 
-| Descrição do campo  | Inicio | Fim | Tamanho | Comentário
-| ------------- | ------------- | -----| ---- | ------
-| Tipo  | 1  | 1 | 1 | Tipo da transação
-| Data  | 2  | 9 | 8 | Data da ocorrência
-| Valor | 10 | 19 | 10 | Valor da movimentação. *Obs.* O valor encontrado no arquivo precisa ser divido por cem(valor / 100.00) para normalizá-lo.
-| CPF | 20 | 30 | 11 | CPF do beneficiário
-| Cartão | 31 | 42 | 12 | Cartão utilizado na transação 
-| Hora  | 43 | 48 | 6 | Hora da ocorrência atendendo ao fuso de UTC-3
-| Dono da loja | 49 | 62 | 14 | Nome do representante da loja
-| Nome loja | 63 | 81 | 19 | Nome da loja
+- O Frontend pode ser acessado em: `http://localhost:3000`
+- A documentação interativa (Swagger UI) do Backend pode ser acessada em: `http://localhost:8000/docs`
 
-# Documentação sobre os tipos das transações
+## 2. Tecnologias Utilizadas (Stack)
 
-| Tipo | Descrição | Natureza | Sinal |
-| ---- | -------- | --------- | ----- |
-| 1 | Débito | Entrada | + |
-| 2 | Boleto | Saída | - |
-| 3 | Financiamento | Saída | - |
-| 4 | Crédito | Entrada | + |
-| 5 | Recebimento Empréstimo | Entrada | + |
-| 6 | Vendas | Entrada | + |
-| 7 | Recebimento TED | Entrada | + |
-| 8 | Recebimento DOC | Entrada | + |
-| 9 | Aluguel | Saída | - |
+### Backend (`apps/api`)
 
-# Avaliação
+- **Python 3**
+- **FastAPI**: Framework web de alta performance para a criação de APIs reativas.
+- **Uvicorn**: Servidor ASGI leve e otimizado.
+- **PostgreSQL**: Banco de dados relacional.
+- **SQLAlchemy**: ORM (Object Relational Mapper) e construtor de SQL para interação com o banco.
+- **Pytest**: Framework para implementação e execução de testes automatizados.
+- **Pydantic**: Biblioteca para validação de dados garantindo segurança (Type hints).
 
-Seu projeto será avaliado de acordo com os seguintes critérios.
+### Frontend (`apps/web`)
 
-1. Sua aplicação preenche os requerimentos básicos?
-2. Você documentou a maneira de configurar o ambiente e rodar sua aplicação?
-3. Você seguiu as instruções de envio do desafio?
-4. Qualidade e cobertura dos testes unitários.
+- **React**: Biblioteca Javascript para a construção da interface do usuário.
+- **React Router (v7)**: Controle de roteamento na aplicação web.
+- **Vite**: Ferramenta de build de extrema velocidade, focada em entregar boa experiência de uso.
+- **Tailwind CSS**: Framework CSS para estilização rápida por utility classes.
+- **TypeScript**: Superset de tipagem estática que previne erros no desenvolvimento.
+- **Axios**: Cliente HTTP para requisições com o backend.
 
-Adicionalmente, tentaremos verificar a sua familiarização com as bibliotecas padrões (standard libs), bem como sua experiência com programação orientada a objetos a partir da estrutura de seu projeto.
+## 3. Documentação da API (Backend)
 
-# Referência
+O backend possui o formato padronizado de envolope (`ResponseEnvelope`) em todas as respostas (em caso de sucesso ou de erro), cuja estrutura é:
 
-Este desafio foi baseado neste outro desafio: https://github.com/lschallenges/data-engineering
+- `success`: booleano (`true` ou `false`).
+- `data`: os dados de resposta do servidor, caso existam.
+- `message`: mensagem explicativa da resposta.
+- `error`: descrição ou string do erro, preenchida quando acontece falha na regra de negócio ou erro 500.
 
----
+### Endpoints
 
-Boa sorte!
+#### Verificação de Funcionamento
+
+- **`GET /health`**
+  - **Função**: Checar se a aplicação encontra-se saudável.
+  - **Reposta de sucesso (`200`)**: `{"message": "ok"}`
+
+#### Operações com Transações
+
+- **`POST /api/v1/transactions/import`**
+
+  - **Função**: Recebe o arquivo CNAB por um form-data multipart, faz processamento, extrai as transações contidas e insere no banco de dados.
+  - **Corpo da requisição (MIME: `multipart/form-data`)**:
+    - `file`: O arquivo `.txt` contendo as transações CNAB.
+  - **Resposta de sucesso (`201 Created`)**:
+    - Retorna a listagem serializada com as transações normalizadas na chave `data`.
+- **`GET /api/v1/transactions/`**
+
+  - **Função**: Recupera a listagem plana (array) paginada das transações financeiras.
+  - **Parâmetros de Consulta (Query)**:
+    - `page` _(integer, default 1)_: A página desejada de resultados.
+    - `page_size` _(integer, default 50)_: O número máximo de resultados.
+  - **Resposta de sucesso (`200 OK`)**:
+    - Traz o `data` fixado como um Array contendo os objetos `OutputTransactionDTO`.
+- **`GET /api/v1/transactions/summary`**
+
+  - **Função**: Retorna um sumário completo contendo transações agrupadas explicitamente por Loja (Store), simplificando a confecção de painéis / dashboards focados em saldo.
+  - **Parâmetros de Consulta (Query)**:
+    - `page` _(integer, default 1)_: A página desejada de resultados.
+    - `page_size` _(integer, default 50)_: O número máximo de transações por loja.
+  - **Resposta de sucesso (`200 OK`)**:
+    - Traz o `data` em formato de Dicionário, onde cada chave é o *Nome da Loja*, contendo as transações que pertencem a ela.
+
+## 4. Como Consumir os Endpoints
+
+Aqui estão exemplos práticos usando `curl` e JavaScript nativo (`fetch`) que demonstram como é feita a interação com a camada de serviços da API.
+
+### A) Consumindo com cURL (Testes via Terminal de Comando)
+
+**Fazer o upload do arquivo CNAB:**
+*(Considere que você tem acesso a um arquivo chamado `CNAB.txt` no mesmo diretório do seu terminal)*
+
+```bash
+curl -X POST http://localhost:8000/api/v1/transactions/import \
+  -H "accept: application/json" \
+  -H "Content-Type: multipart/form-data" \
+  -F "file=@CNAB.txt"
+```
+
+**Listar Transações Paginas:**
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/transactions/?page=1&page_size=20" \
+  -H "accept: application/json"
+```
+
+**Listar Transações Agrupadas por Loja (Dashboard Summary):**
+Este endpoint é bastante útil para exibição de dashboard financeiro em uma única visualização.
+
+```bash
+curl -X GET "http://localhost:8000/api/v1/transactions/summary?page=1&page_size=50" \
+  -H "accept: application/json"
+```
+
+### B) Consumindo com JavaScript Nativo (`fetch`)
+
+**Upload do arquivo em requisições de Front-end:**
+
+```javascript
+const uploadArquivo = async (fileInputValue) => {
+  const formData = new FormData();
+  formData.append('file', fileInputValue); // fileInputValue é o objeto literal de tipo File
+
+  try {
+    const response = await fetch('http://localhost:8000/api/v1/transactions/import', {
+      method: 'POST',
+      body: formData,
+    });
+  
+    const result = await response.json();
+    console.log(result.data); // transações processadas com envelope desempacotado
+  } catch (error) {
+    console.error('Erro de envio ou parse', error);
+  }
+};
+```
+
+**Listando saldos agrupados:**
+
+```javascript
+const carregarFinanceiro = async () => {
+  try {
+    const url = new URL('http://localhost:8000/api/v1/transactions/summary');
+    url.searchParams.append('page', '1');
+    url.searchParams.append('page_size', '50');
+
+    const response = await fetch(url);
+    const result = await response.json();
+  
+    // Validando o envelope e imprimindo no caso de sucesso.
+    if(result.success) {
+      console.log('Listagem das lojas e seus totais:', result.data);
+    }
+  } catch (error) {
+    console.error('Falha de requisição', error);
+  }
+}
+
+carregarFinanceiro();
+```

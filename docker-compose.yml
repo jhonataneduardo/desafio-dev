@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: ./apps/web
+      dockerfile: Dockerfile
+    container_name: web
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - VITE_API_URL=http://api:8000
+    depends_on:
+      - api
+
+  api:
+    build:
+      context: ./apps/api
+      dockerfile: Dockerfile
+    container_name: api
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_NAME=desafio_db
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+      - DATABASE_USER=desafio_user
+      - DATABASE_PASSWORD=desafio_password
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./apps/api:/app
+    command: uvicorn src.main:app --host 0.0.0.0 --port 8000 --reload
+
+  db:
+    image: postgres:15-alpine
+    container_name: db
+    environment:
+      - POSTGRES_DB=desafio_db
+      - POSTGRES_USER=desafio_user
+      - POSTGRES_PASSWORD=desafio_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U desafio_user -d desafio_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
