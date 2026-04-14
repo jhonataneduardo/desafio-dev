@@ -1,6 +1,5 @@
 from fastapi.responses import JSONResponse
 from presentation.routers.transactions_routers import TransactionRouter
-from presentation.routers.upload_routers import UploadRouter
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.requests import Request
@@ -41,4 +40,3 @@ async def health():
     return {"message": "ok"}
 
 app.include_router(TransactionRouter, prefix="/api/v1")
-app.include_router(UploadRouter, prefix="/api/v1")

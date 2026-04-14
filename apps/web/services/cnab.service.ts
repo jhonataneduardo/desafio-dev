@@ -6,7 +6,7 @@ export const cnabService = {
     const formData = new FormData();
     formData.append('file', file);
 
-    const response = await api.post('/uploads/cnab', formData, {
+    const response = await api.post('/transactions/import', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
       },

@@ -41,7 +41,7 @@ const TYPE_MAP: Record<number, { label: string; kind: 'credit' | 'debit' }> = {
 
 export const transactionsService = {
   async getTransactionsGroupedByStore(): Promise<UIStoreGroup[]> {
-    const response = await api.get('/transactions?group_by=store');
+    const response = await api.get('/transactions/summary');
     
     // The backend groups data returning an object like: { "Store A": [...transactions], "Store B": [...] }
     const groupedData: Record<string, ApiTransaction[]> = response.data?.data || {};
