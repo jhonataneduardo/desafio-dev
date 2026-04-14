@@ -4,7 +4,7 @@ from datetime import date, time
 
 from domain.entities import EntityTransaction, TypeTransaction
 from domain.repositories import TransactionRepositoryInterface
-from application.dtos.input_dto import ParamsSearchTransactionsDTO
+from domain.entities import TransactionQuery
 from application.usecases.search_transactions_use_case import SearchTransactionsUseCase
 
 
@@ -86,7 +86,7 @@ class TestSearchTransactionsUseCase:
     def test_execute_without_group_by_returns_list(
         self, use_case, mock_repository, sample_transactions
     ):
-        params = ParamsSearchTransactionsDTO(group_by=None)
+        params = TransactionQuery(group_by=None)
         mock_repository.find_all.return_value = sample_transactions
 
         result = use_case.execute(params)
@@ -98,7 +98,7 @@ class TestSearchTransactionsUseCase:
     def test_execute_with_group_by_store_returns_dict(
         self, use_case, mock_repository, transactions_multiple_stores
     ):
-        params = ParamsSearchTransactionsDTO(group_by="store")
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.return_value = transactions_multiple_stores
 
         result = use_case.execute(params)
@@ -110,7 +110,7 @@ class TestSearchTransactionsUseCase:
     def test_execute_with_group_by_store_groups_correctly(
         self, use_case, mock_repository, transactions_multiple_stores
     ):
-        params = ParamsSearchTransactionsDTO(group_by="store")
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.return_value = transactions_multiple_stores
 
         result = use_case.execute(params)
@@ -121,7 +121,7 @@ class TestSearchTransactionsUseCase:
     def test_execute_with_group_by_store_single_store(
         self, use_case, mock_repository, transactions_same_store
     ):
-        params = ParamsSearchTransactionsDTO(group_by="store")
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.return_value = transactions_same_store
 
         result = use_case.execute(params)
@@ -131,7 +131,7 @@ class TestSearchTransactionsUseCase:
         assert len(result["BAR DO JOAO"]) == 2
 
     def test_execute_with_empty_result(self, use_case, mock_repository):
-        params = ParamsSearchTransactionsDTO(group_by=None)
+        params = TransactionQuery(group_by=None)
         mock_repository.find_all.return_value = []
 
         result = use_case.execute(params)
@@ -139,7 +139,7 @@ class TestSearchTransactionsUseCase:
         assert result == []
 
     def test_execute_with_group_by_store_empty_result(self, use_case, mock_repository):
-        params = ParamsSearchTransactionsDTO(group_by="store")
+        params = TransactionQuery(group_by="store")
         mock_repository.find_all.return_value = []
 
         result = use_case.execute(params)
@@ -148,7 +148,7 @@ class TestSearchTransactionsUseCase:
         assert len(result) == 0
 
     def test_execute_propagates_repository_exception(self, use_case, mock_repository):
-        params = ParamsSearchTransactionsDTO(group_by=None)
+        params = TransactionQuery(group_by=None)
         mock_repository.find_all.side_effect = Exception("Database error")
 
         with pytest.raises(Exception, match="Database error"):

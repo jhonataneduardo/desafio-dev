@@ -23,11 +23,11 @@ class TypeTransaction(Enum):
 @dataclass
 class EntityBase:
     id: int = field(default=None, repr=False, kw_only=True)
-    created_at: datetime = field(default=datetime.now(), kw_only=True)
+    created_at: datetime = field(default_factory=datetime.now, kw_only=True)
     updated_at: datetime = field(default=None, kw_only=True)
 
 
-@dataclass(slots=True)
+@dataclass
 class EntityTransaction(EntityBase):
     type: TypeTransaction
     date: date
@@ -43,5 +43,12 @@ class EntityTransaction(EntityBase):
 
     @classmethod
     def from_dict(cls, data: Dict):
-        data_copy = data
+        data_copy = data.copy()
         return cls(**data_copy)
+
+
+@dataclass
+class TransactionQuery:
+    group_by: str | None = None
+    page: int = 1
+    page_size: int = 50
